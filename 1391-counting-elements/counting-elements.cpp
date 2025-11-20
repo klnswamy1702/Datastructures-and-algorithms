@@ -1,21 +1,13 @@
 class Solution {
 public:
     int countElements(vector<int>& arr) {
+        unordered_set<int> hashSet(arr.begin(), arr.end());
         int count = 0;
-        for (auto x : arr) {
-            if (integerInArray(arr, x + 1)) {
+        for (int x : arr) {
+            if (hashSet.find(x + 1) != hashSet.end()) {
                 count++;
             }
         }
         return count;
-    }
-
-    bool integerInArray(vector<int>& arr, int target) {
-        for (auto x : arr) {
-            if (x == target) {
-                return true;
-            }
-        }
-        return false;
     }
 };
