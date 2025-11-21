@@ -1,15 +1,13 @@
 class Solution {
 public:
     bool canPermutePalindrome(string s) {
-        int map[128] = {0};
-        int count = 0;
-        for (int i = 0; i < s.length(); i++) {
-            map[int(s[i])]++;
-            if (map[int(s[i])] % 2 == 0)
-                count--;
+        unordered_set<char> char_set;
+        for (char c : s) {
+            if (char_set.find(c) != char_set.end())
+                char_set.erase(c);
             else
-                count++;
+                char_set.insert(c);
         }
-        return count <= 1;
+        return char_set.size() <= 1;
     }
 };
