@@ -1,17 +1,10 @@
 class Solution {
 public:
-    char shiftLetter(char letter, int shift) {
-        return (letter - shift + 26) % 26 + 'a';
-    }
-    
     // Create a hash value
-    string getHash(string& s) {
-        // Calculate the number of shifts to make the first character to be 'a'
-        int shift = s[0];
+    string getHash(string &s) {
         string hashKey;
-        
-        for (char letter : s) {
-            hashKey += shiftLetter(letter, shift);
+        for (int i = 1; i < s.length(); i++) {
+            hashKey += (s[i] - s[i - 1] + 26) % 26 + 'a';
         }
         
         return hashKey;
@@ -21,7 +14,7 @@ public:
         unordered_map<string, vector<string>> mapHashToList;
         
         // Create a hash_value (hashKey) for each string and append the string
-        // to the list of hash values i.e. mapHashToList["abc"] = ["abc", "bcd"]
+        // to the list of hash values i.e. mapHashToList["cd"] = ["acf", "gil", "xzc"]
         for (string str : strings) {
             string hashKey = getHash(str);
             mapHashToList[hashKey].push_back(str);
@@ -33,6 +26,7 @@ public:
             groups.push_back(it.second);
         }
         
+        // Return a list of all of the grouped strings
         return groups;
     }
 };
