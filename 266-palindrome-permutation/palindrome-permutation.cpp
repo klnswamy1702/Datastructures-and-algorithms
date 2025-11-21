@@ -2,12 +2,13 @@ class Solution {
 public:
     bool canPermutePalindrome(string s) {
         int map[128] = {0};
-        for (char c : s) {
-            map[int(c)]++;
-        }
         int count = 0;
-        for (int i = 0; i < 128 && count <= 1; i++) {
-            count += map[i] % 2;
+        for (int i = 0; i < s.length(); i++) {
+            map[int(s[i])]++;
+            if (map[int(s[i])] % 2 == 0)
+                count--;
+            else
+                count++;
         }
         return count <= 1;
     }
