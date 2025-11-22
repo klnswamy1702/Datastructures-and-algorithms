@@ -1,36 +1,36 @@
-from collections import deque
+# In Python, we have to make do with the OrderedDict class. We can use it as a Set by setting
+# the values to None.
+
+from collections import OrderedDict
 
 class FirstUnique:
 
     def __init__(self, nums: List[int]):
-        self._queue = deque(nums)
+        self._queue = OrderedDict()
         self._is_unique = {}
         for num in nums:
             # Notice that we're calling the "add" method of FirstUnique; not of the queue. 
             self.add(num)
         
     def showFirstUnique(self) -> int:
-        # We need to start by "cleaning" the queue of any non-uniques at the start.
-        # Note that we know that if a value is in the queue, then it is also in
-        # is_unique, as the implementation of add() guarantees this.
-        while self._queue and not self._is_unique[self._queue[0]]:
-            self._queue.popleft()
         # Check if there is still a value left in the queue. There might be no uniques.
         if self._queue:
-            return self._queue[0] # We don't want to actually *remove* the value.
+            # We don't want to actually *remove* the value.
+            # Seeing as OrderedDict has no "get first" method, the way that we can get
+            # the first value is to create an iterator, and then get the "next" value
+            # from that. Note that this is O(1).
+            return next(iter(self._queue))
         return -1
         
     def add(self, value: int) -> None:
         # Case 1: We need to add the number to the queue and mark it as unique. 
         if value not in self._is_unique:
             self._is_unique[value] = True
-            self._queue.append(value)
-        # Case 2 and 3: We need to mark the number as no longer unique.
-        else:
+            self._queue[value] = None
+        # Case 2: We need to mark the value as no longer unique and then 
+        # remove it from the queue.
+        elif self._is_unique[value]:
             self._is_unique[value] = False
-
-
-# Your FirstUnique object will be instantiated and called as such:
-# obj = FirstUnique(nums)
-# param_1 = obj.showFirstUnique()
-# obj.add(value)
+            self._queue.pop(value)
+        # Case 3: We don't need to do anything; the number was removed from the queue
+        # the second time it occurred.
