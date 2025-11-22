@@ -1,21 +1,26 @@
 class MovingAverage {
 private:
-    int size, windowSum = 0, count = 0;
-    std::deque<int> queue;
+    int size;
+    int head = 0;
+    int windowSum = 0;
+    int count = 0;
+    vector<int> queue;
 
 public:
-    MovingAverage(int size) { this->size = size; }
+    MovingAverage(int size) {
+        this->size = size;
+        queue = vector<int>(size);
+    }
 
     double next(int val) {
         ++count;
         // calculate the new sum by shifting the window
-        queue.push_back(val);
-        int tail = count > size ? queue.front() : 0;
-        if (count > size) queue.pop_front();
-
-        windowSum = windowSum - tail + val;
-
-        return static_cast<double>(windowSum) / std::min(size, count);
+        int tail = (head + 1) % size;
+        windowSum = windowSum - queue[tail] + val;
+        // move on to the next head
+        head = (head + 1) % size;
+        queue[head] = val;
+        return windowSum * 1.0 / min(size, count);
     }
 };
 
