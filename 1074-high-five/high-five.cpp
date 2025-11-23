@@ -5,27 +5,21 @@ private:
 public:
     vector<vector<int>> highFive(vector<vector<int>>& items) {
         this->K = 5;
-        // sort items using the custom comparator      
-        sort(items.begin(), items.end(),
-            [](const vector<int> &a, const vector<int> &b) {
-                if (a[0] != b[0])
-                // item with lower id goes first
-                return a[0] < b[0];
-                // in case of tie for ids, item with higher score goes first 
-                return a[1] > b[1];
-            });
+        map<int, priority_queue<int>> allScores;
+        for (const auto &item: items) {
+            int id = item[0];
+            int score = item[1];
+            // Add score to the max heap
+            allScores[id].push(score);
+        }
         vector<vector<int>> solution;
-        int n = items.size();
-        int i = 0;
-        while (i < n) {
-            int id = items[i][0];
+        for (auto &[id, scores] : allScores) {
             int sum = 0;
-            // obtain total using the top 5 scores
-            for (int k = i; k < i + this->K; ++k)
-                sum += items[k][1];
-            // ignore all the other scores for the same id
-            while (i < n && items[i][0] == id)
-                i++;
+            // obtain the top k scores (k = 5)
+            for (int i = 0; i < this->K; ++i) {
+                sum += scores.top();
+                scores.pop();
+            }
             solution.push_back({id, sum / this->K});
         }
         return solution;
