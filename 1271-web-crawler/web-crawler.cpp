@@ -16,23 +16,24 @@ public:
             // if there is no such slash, pos will be equal to url.size()
             int pos = min(url.size(), url.find('/', 7));
             // return the substring that starts after "http://" and ends
-            // before the next slash of at the end of the string
+            // before the next slash or at the end of the string
             return url.substr(7, pos - 7);
         };
 
+        queue<string> q;
+        q.push(startUrl);
+        unordered_set<string> visited{startUrl};
         string startHostname = getHostname(startUrl);
-        unordered_set<string> visited;
-
-        function<void(string)> dfs = [&](string url) -> void {
-            visited.insert(url);
+        while (!q.empty()) {
+            string url = q.front();
+            q.pop();
             for (string nextUrl : htmlParser.getUrls(url)) {
                 if (getHostname(nextUrl) == startHostname && !visited.count(nextUrl)) {
-                    dfs(nextUrl);
+                    q.push(nextUrl);
+                    visited.insert(nextUrl);
                 }
             }
-        };
-
-        dfs(startUrl);
+        }
         return vector<string>(visited.begin(), visited.end());
     }
 };
