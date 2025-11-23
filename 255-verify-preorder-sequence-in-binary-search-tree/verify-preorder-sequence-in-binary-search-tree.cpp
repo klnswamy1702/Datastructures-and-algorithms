@@ -1,23 +1,23 @@
 class Solution {
 public:
     bool verifyPreorder(vector<int>& preorder) {
-        int minLimit = INT_MIN;
         int i = 0;
-        
-        for (int num: preorder) {
-            while (i > 0 && preorder[i - 1] < num) {
-                minLimit = preorder[i - 1];
-                i--;
-            }
-            
-            if (num <= minLimit) {
-                return false;
-            }
-            
-            preorder[i] = num;
-            i++;
+        return helper(preorder, i, INT_MIN, INT_MAX);
+    }
+    
+    bool helper(vector<int>& preorder, int& i, int minLimit, int maxLimit) {
+        if (i == preorder.size()) {
+            return true;
         }
         
-        return true;
+        int root = preorder[i];
+        if (root <= minLimit || root >= maxLimit) {
+            return false;
+        }
+        
+        i++;
+        bool left = helper(preorder, i, minLimit, root);
+        bool right = helper(preorder, i, root, maxLimit);
+        return left || right;
     }
 };
