@@ -4,39 +4,37 @@
  *     int val;
  *     TreeNode *left;
  *     TreeNode *right;
- *     TreeNode() : val(0), left(nullptr), right(nullptr) {}
- *     TreeNode(int x) : val(x), left(nullptr), right(nullptr) {}
- *     TreeNode(int x, TreeNode *left, TreeNode *right) : val(x), left(left), right(right) {}
- * };
- */
-/**
- * Definition for a binary tree node.
- * struct TreeNode {
- *     int val;
- *     TreeNode *left;
- *     TreeNode *right;
  *     TreeNode(int x) : val(x), left(NULL), right(NULL) {}
  * };
  */
 class Solution {
 public:
-    void postorderTraversalHelper(TreeNode* currentNode, vector<int>& result) {
-        // Base case: if the node is null, return
-        if (!currentNode) {
-            return;
-        }
-        // Traverse left subtree
-        postorderTraversalHelper(currentNode->left, result);
-        // Traverse right subtree
-        postorderTraversalHelper(currentNode->right, result);
-        // Add the current node's value to the result list
-        result.push_back(currentNode->val);
-    }
-
     vector<int> postorderTraversal(TreeNode* root) {
+        // Vector to store the result of postorder traversal
         vector<int> result;
-        // Start traversal from root
-        postorderTraversalHelper(root, result);
+        // Stack to facilitate the traversal of nodes
+        stack<TreeNode*> traversalStack;
+        TreeNode* currentNode = root;
+
+        // Traverse the tree while there are nodes to process
+        while (currentNode != nullptr || !traversalStack.empty()) {
+            if (currentNode != nullptr) {
+                // Add current node's value to result list before going to its
+                // children
+                result.push_back(currentNode->val);
+                // Push current node onto the stack
+                traversalStack.push(currentNode);
+                // Move to the right child
+                currentNode = currentNode->right;
+            } else {
+                // Pop the node from the stack and move to its left child
+                currentNode = traversalStack.top();
+                traversalStack.pop();
+                currentNode = currentNode->left;
+            }
+        }
+        // Reverse the result list to get the correct postorder sequence
+        reverse(result.begin(), result.end());
         return result;
     }
 };
