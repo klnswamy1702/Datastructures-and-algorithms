@@ -10,31 +10,44 @@
 class Solution {
 public:
     vector<int> postorderTraversal(TreeNode* root) {
-        // Vector to store the result of postorder traversal
         vector<int> result;
-        // Stack to facilitate the traversal of nodes
-        stack<TreeNode*> traversalStack;
-        TreeNode* currentNode = root;
 
-        // Traverse the tree while there are nodes to process
-        while (currentNode != nullptr || !traversalStack.empty()) {
-            if (currentNode != nullptr) {
-                // Add current node's value to result list before going to its
-                // children
-                result.push_back(currentNode->val);
-                // Push current node onto the stack
-                traversalStack.push(currentNode);
-                // Move to the right child
-                currentNode = currentNode->right;
+        // If the root is null, return an empty list
+        if (!root) {
+            return result;
+        }
+
+        // Stack to manage the traversal
+        stack<TreeNode*> mainStack;
+        // Stack to manage the path
+        stack<TreeNode*> pathStack;
+
+        // Start with the root node
+        mainStack.push(root);
+
+        // Process nodes until the main stack is empty
+        while (!mainStack.empty()) {
+            root = mainStack.top();
+
+            // If the node is in the path stack and it's the top, add its value
+            if (!pathStack.empty() && pathStack.top() == root) {
+                result.push_back(root->val);
+                mainStack.pop();
+                pathStack.pop();
             } else {
-                // Pop the node from the stack and move to its left child
-                currentNode = traversalStack.top();
-                traversalStack.pop();
-                currentNode = currentNode->left;
+                // Push the current node to the path stack
+                pathStack.push(root);
+                // Push right child if it exists
+                if (root->right) {
+                    mainStack.push(root->right);
+                }
+                // Push left child if it exists
+                if (root->left) {
+                    mainStack.push(root->left);
+                }
             }
         }
-        // Reverse the result list to get the correct postorder sequence
-        reverse(result.begin(), result.end());
+
         return result;
     }
 };
