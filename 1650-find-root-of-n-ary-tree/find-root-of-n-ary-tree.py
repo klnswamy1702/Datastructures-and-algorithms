@@ -5,18 +5,19 @@ class Node:
         self.val = val
         self.children = children if children is not None else []
 """
+
 class Solution:
     def findRoot(self, tree: List['Node']) -> 'Node':
-        # set that contains all the child nodes.
-        seen = set()
+        value_sum = 0
 
-        # add all the child nodes into the set
         for node in tree:
+            # the value is added as a parent node
+            value_sum += node.val
             for child in node.children:
-                # we could either add the value or the node itself.
-                seen.add(child.val)
+                # the value is deducted as a child node.
+                value_sum -= child.val
 
-        # find the node that is not in the child node set.
+        # the value of the root node is `value_sum`
         for node in tree:
-            if node.val not in seen:
+            if node.val == value_sum:
                 return node
