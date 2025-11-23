@@ -1,33 +1,50 @@
 class MaxStack {
 private:
-    set<pair<int, int>> stack;
-    set<pair<int, int>> values;
+    stack<pair<int, int>> stk;
+    priority_queue<pair<int, int>> heap;
+    unordered_set<int> removed;
     int cnt;
 
 public:
     MaxStack() { cnt = 0; }
 
     void push(int x) {
-        stack.insert({cnt, x});
-        values.insert({x, cnt});
+        stk.push({x, cnt});
+        heap.push({x, cnt});
         cnt++;
     }
 
     int pop() {
-        pair<int, int> p = *stack.rbegin();
-        stack.erase(p);
-        values.erase({p.second, p.first});
-        return p.second;
+        while (removed.count(stk.top().second)) {
+            stk.pop();
+        }
+        const pair<int, int> p = stk.top();
+        stk.pop();
+        removed.insert(p.second);
+        return p.first;
     }
 
-    int top() { return stack.rbegin()->second; }
+    int top() {
+        while (removed.count(stk.top().second)) {
+            stk.pop();
+        }
+        return stk.top().first;
+    }
 
-    int peekMax() { return values.rbegin()->first; }
+    int peekMax() {
+        while (removed.count(heap.top().second)) {
+            heap.pop();
+        }
+        return heap.top().first;
+    }
 
     int popMax() {
-        pair<int, int> p = *values.rbegin();
-        values.erase(p);
-        stack.erase({p.second, p.first});
+        while (removed.count(heap.top().second)) {
+            heap.pop();
+        }
+        const pair<int, int> p = heap.top();
+        heap.pop();
+        removed.insert(p.second);
         return p.first;
     }
 };
