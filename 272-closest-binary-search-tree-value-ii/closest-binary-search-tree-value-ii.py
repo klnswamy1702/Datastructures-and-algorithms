@@ -17,16 +17,14 @@ class Solution:
         arr = []
         dfs(root, arr)
         
-        left = bisect_left(arr, target) - 1
-        right = left + 1
-        ans = []
+        left = 0
+        right = len(arr) - k
         
-        while len(ans) < k:
-            if right == len(arr) or abs(arr[left] - target) <= abs(arr[right] - target):
-                ans.append(arr[left])
-                left -= 1
+        while left < right:
+            mid = (left + right) // 2
+            if abs(target - arr[mid + k]) < abs(target - arr[mid]):
+                left = mid + 1
             else:
-                ans.append(arr[right])
-                right += 1
-        
-        return ans
+                right = mid
+
+        return arr[left:left + k]
