@@ -1,24 +1,40 @@
+class TreeNode:
+    def __init__(self, val):
+        self.val = val
+        self.left = None
+        self.right = None
+
 class Solution:
     def parseTernary(self, expression: str) -> str:
         
-        # Initialize a stack
-        stack = []
+        # Global Index to Construct Binary Tree
+        self.index = 0
+        root = self.constructTree(expression)
         
-        # Traverse the expression from right to left
-        for char in expression[::-1]:
-            
-            # If stack top is ?, then replace next four characters
-            # with E1 or E2 depending on the value of B
-            if stack and stack[-1] == '?':
-                stack.pop()
-                onTrue = stack.pop()
-                stack.pop()
-                onFalse = stack.pop()
-                stack.append(onTrue if char == 'T' else onFalse)
-            
-            # Otherwise, push this character
+        # Parse the binary tree till we reach the leaf node
+        while root.left and root.right:
+            if root.val == 'T':
+                root = root.left
             else:
-                stack.append(char)
+                root = root.right
         
-        # Return the final character
-        return stack[0]
+        return root.val
+
+    def constructTree(self, expression):
+        
+        # Storing current character of expression
+        root = TreeNode(expression[self.index])
+
+        # If the last character of expression, return
+        if self.index == len(expression) - 1:
+            return root
+        
+        # Check the next character
+        self.index += 1
+        if expression[self.index] == '?':
+            self.index += 1
+            root.left = self.constructTree(expression)
+            self.index += 1
+            root.right = self.constructTree(expression)
+            
+        return root
