@@ -70,7 +70,6 @@ class AutocompleteSystem {
         }
     }
 }
-
 /**
  * Your AutocompleteSystem object will be instantiated and called as such:
  * AutocompleteSystem obj = new AutocompleteSystem(sentences, times);
