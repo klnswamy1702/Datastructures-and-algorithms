@@ -1,57 +1,50 @@
+/**
+ * Definition for a binary tree node.
+ * struct TreeNode {
+ *     int val;
+ *     TreeNode *left;
+ *     TreeNode *right;
+ *     TreeNode() : val(0), left(nullptr), right(nullptr) {}
+ *     TreeNode(int x) : val(x), left(nullptr), right(nullptr) {}
+ *     TreeNode(int x, TreeNode *left, TreeNode *right) : val(x), left(left), right(right) {}
+ * };
+ */
+// Each node will return min node value, max node value, max size
+class NodeValue {
+public:
+    int maxNode, minNode, maxSize;
+    
+    NodeValue(int minNode, int maxNode, int maxSize) {
+        this->maxNode = maxNode;
+        this->minNode = minNode;
+        this->maxSize = maxSize;
+    }
+};
+
 class Solution {
 public:
-    // Track previous node while doing inorder traversal.
-    TreeNode* previous = NULL;
-    
-    // Function to check if given tree is a valid Binary Search Tree or not.
-    bool isValidBST(TreeNode* root) {
-        // An empty tree is a valid Binary Search Tree.
+    NodeValue largestBSTSubtreeHelper(TreeNode* root) {
+        // An empty tree is a BST of size 0.
         if (!root) {
-            return true;
-        }
-
-        // If left subtree is not a valid BST return false.
-        if(!isValidBST(root->left)) {
-            return false;
+            return NodeValue(INT_MAX, INT_MIN, 0);
         }
         
-        // If current node's value is not greater than the previous 
-        // node's value in the in-order traversal return false.
-        if (previous && previous->val >= root->val) {
-            return false;
+        // Get values from left and right subtree of current tree.
+        auto left = largestBSTSubtreeHelper(root->left);
+        auto right = largestBSTSubtreeHelper(root->right);
+        
+        // Current node is greater than max in left AND smaller than min in right, it is a BST.
+        if (left.maxNode < root->val && root->val < right.minNode) {
+            // It is a BST.
+            return NodeValue(min(root->val, left.minNode), max(root->val, right.maxNode), 
+                            left.maxSize + right.maxSize + 1);
         }
         
-        // Update previous node to current node.
-        previous = root;
-        
-        // If right subtree is not a valid BST return false.
-        return isValidBST(root->right);
-    }
-
-    int countNodes(TreeNode* root) {
-        if (!root) {
-            return 0;
-        }
-        
-        // Add nodes in left and right subtree.
-        // Add 1 and return total size.
-        return 1 + countNodes(root->left) + countNodes(root->right);
+        // Otherwise, return [-inf, inf] so that parent can't be valid BST
+        return NodeValue(INT_MIN, INT_MAX, max(left.maxSize, right.maxSize));
     }
     
     int largestBSTSubtree(TreeNode* root) {
-        if (!root) {
-            return 0;
-        }
-        
-        // Set previous node to NULL initially.
-        previous = NULL;
-        
-        // If current subtree is a validBST, its children will have smaller size BST.
-        if (isValidBST(root)) {
-            return countNodes(root);
-        }
-        
-        // Find BST in left and right subtrees of current nodes.
-        return max(largestBSTSubtree(root->left), largestBSTSubtree(root->right));
+        return largestBSTSubtreeHelper(root).maxSize;
     }
 };
