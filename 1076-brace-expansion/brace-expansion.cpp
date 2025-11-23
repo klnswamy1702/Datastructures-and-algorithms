@@ -1,45 +1,54 @@
 class Solution {
 public:
-    int storeFirstOptions(string& s, int startPos, vector<string>& firstOptions) {
-        // If the first character is not '{', it means a single character
-        if (s[startPos] != '{') {
-            firstOptions.push_back(string(1, s[startPos]));
-        } else {
-            // Store all the characters between '{' and '}'
-            while (s[startPos] != '}') {
-                 if (s[startPos] >= 'a' && s[startPos] <= 'z') {
-                     firstOptions.push_back(string(1, s[startPos]));
-                 }
-                startPos++;
+    vector<vector<char>> allOptions;
+    
+    void storeAllOptions(string& s) {
+        for (int pos = 0; pos < s.size(); pos++) {
+            vector<char> currOptions;
+            
+            // If the first character is not '{', it means a single character
+            if (s[pos] != '{') {
+                currOptions.push_back(s[pos]);
+            } else {
+                // Store all the characters between '{' and '}'
+                while (s[pos] != '}') {
+                    if (s[pos] >= 'a' && s[pos] <= 'z') {
+                        currOptions.push_back(s[pos]);
+                    }
+                    pos++;
+                }
+                // Sort the list
+                sort(currOptions.begin(), currOptions.end());
             }
-            // Sort the list
-            sort(firstOptions.begin(), firstOptions.end());
+            allOptions.push_back(currOptions);
         }
-        // Increment it to point to the next character to be considered
-        return startPos + 1;
+    }
+    
+    void generateWords(string currString, vector<string>& expandedWords) {
+        // If the currString is complete, we can store and return
+        if (currString.size() == allOptions.size()) {
+            expandedWords.push_back(currString);
+            return;
+        }
+        
+        // Fetch the options for the current index
+        vector<char> currOptions = allOptions[currString.size()];
+
+        // Add the character and go into recursion
+        for (char c : currOptions) {
+            currString += c;
+            generateWords(currString, expandedWords);
+            // Backtrack to previous state
+            currString.pop_back();
+        }
     }
     
     vector<string> expand(string s) {
-        vector<string> expandedWords = {""};
+        // Store the character options for different indices
+        storeAllOptions(s);
         
-        int startPos = 0;
-        while (startPos < s.size()) {
-            vector<string> firstOptions;
-            // Store the characters for the first index as string in firstOptions
-            int remStringStartPos = storeFirstOptions(s, startPos, firstOptions);
-            
-            vector<string> currWords;
-            // Append the string in the list firstOptions to string in expandedWords
-            for (string word : expandedWords) {
-                for (string c : firstOptions) {
-                    currWords.push_back(word + c);
-                }
-            }
-            // Update the list expandedWords to have all the words
-            expandedWords = currWords;
-            // Pointing to the next character to be considered
-            startPos = remStringStartPos;
-        }
+        vector<string> expandedWords;
+        generateWords("", expandedWords);
         return expandedWords;
     }
 };
