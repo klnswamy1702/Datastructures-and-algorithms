@@ -1,45 +1,60 @@
 class Solution {
 public:
     // Function to return the Manhattan distance
-    int findDistance(vector<int>& worker, vector<int>& bike) {
-        return abs(worker[0] - bike[0]) + abs(worker[1] - bike[1]);
+    int distance(vector<int>& worker_loc, vector<int>& bike_loc) {
+        return abs(worker_loc[0] - bike_loc[0]) + abs(worker_loc[1] - bike_loc[1]);
     }
     
     vector<int> assignBikes(vector<vector<int>>& workers, vector<vector<int>>& bikes) {
-        int minDis = INT_MAX;
-        // Stores the list of (worker, bike) pairs corresponding to its distance
-        vector<pair<int, int>> disToPairs[1999];
+        // List of triplets (distance, worker, bike) for each bike corresponding to worker
+        vector<vector<tuple<int, int, int>>> workerToBikeList;
         
-        // Add the (worker, bike) pairs corresponding to their distance list
+        priority_queue<tuple<int, int, int>, vector<tuple<int, int, int>>, 
+                       greater<tuple<int, int, int>>> pq;
+        
         for (int worker = 0; worker < workers.size(); worker++) {
+            // Add all the bikes with their distances from the current worker
+            vector<tuple<int, int, int>> currWorkerPairs;
             for (int bike = 0; bike < bikes.size(); bike++) {
-                int distance = findDistance(workers[worker], bikes[bike]);
-                disToPairs[distance].push_back({worker, bike});
-                minDis = min(minDis, distance);
+                int dist = distance(workers[worker], bikes[bike]);
+                currWorkerPairs.push_back({dist, worker, bike});
             }
+            
+            // Sort the workerToBikeList for the current worker in reverse order.
+            sort(currWorkerPairs.begin(), currWorkerPairs.end(), greater<tuple<int, int, int>>());
+
+            // For each worker, add their closest bike to the priority queue
+            pq.push(currWorkerPairs.back());
+            // Second last bike is now the closest bike for this worker
+            currWorkerPairs.pop_back();
+            
+            // Store the remaining options for the current worker in workerToBikeList
+            workerToBikeList.push_back(currWorkerPairs);
         }
         
-        int currDis = minDis;
         // Initialize all values to false, to signify no bikes have been taken
         vector<int> bikeStatus(bikes.size(), false);
         // Initialize all index to -1, to signify no worker has a bike
         vector<int> workerStatus(workers.size(), -1);
-        // Keep track of how many worker-bike pairs have been made
-        int pairCount = 0;
         
-        // Until all workers have not been assigned a bike
-        while (pairCount != workers.size()) {
-            for (auto[worker, bike] : disToPairs[currDis]) {
-                if (workerStatus[worker] == -1 && !bikeStatus[bike]) {
-                    // If both worker and bike are free, assign them to each other
-                    bikeStatus[bike] = true;
-                    workerStatus[worker] = bike;
-                    pairCount++;
-                }
+        while (!pq.empty()) {
+            // Pop the pair with smallest distance
+            auto[dist, worker, bike] = pq.top();
+            pq.pop();
+            bike = bike;
+            worker = worker;
+            
+            if (!bikeStatus[bike]) {
+                // If the bike is free, assign the bike to the worker
+                bikeStatus[bike] = true;
+                workerStatus[worker] = bike;
+            } else {
+                // Otherwise, add the next closest bike for the current worker
+                pq.push(workerToBikeList[worker].back());
+                workerToBikeList[worker].pop_back();
             }
-            currDis++;
         }
         
-        return workerStatus;
+        return workerStatus;       
     }
 };
