@@ -2,19 +2,20 @@ class Solution {
 public:
     bool verifyPreorder(vector<int>& preorder) {
         int minLimit = INT_MIN;
-        stack<int> stack;
+        int i = 0;
         
         for (int num: preorder) {
-            while (!stack.empty() && stack.top() < num) {
-                minLimit = stack.top();
-                stack.pop();
+            while (i > 0 && preorder[i - 1] < num) {
+                minLimit = preorder[i - 1];
+                i--;
             }
             
             if (num <= minLimit) {
                 return false;
             }
             
-            stack.push(num);
+            preorder[i] = num;
+            i++;
         }
         
         return true;
