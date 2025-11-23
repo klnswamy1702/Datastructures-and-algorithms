@@ -12,11 +12,13 @@ class Solution:
             return root
 
         new_root = Node(root.val)
-        # Starting point to kick off the DFS visits.
-        stack = [(root, new_root)]
+        # Starting point to kick off the BFS visits.
+        queue = deque([(root, new_root)])
 
-        while stack:
-            old_node, new_node = stack.pop()
+        while queue:
+            # Get the element from the head of the queue.
+            old_node, new_node = queue.popleft()
+
             for child_node in old_node.children:
                 new_child_node = Node(child_node.val)
 
@@ -24,6 +26,6 @@ class Solution:
                 new_node.children.append(new_child_node)
 
                 # Schedule a visit to copy the child nodes of each child node.
-                stack.append((child_node, new_child_node))
+                queue.append((child_node, new_child_node))
 
         return new_root
